@@ -5,14 +5,14 @@ using namespace std;
 
 class HMM{
 private:
-    int N;		/* number of states;  Q={1,2,...,N} */
-    int M; 		/* number of observation symbols; V={1,2,...,M}*/
+    int N;		/* number of states;  Q={1,2,...,N} 隐藏状态的个数*/
+    int M; 		/* number of observation symbols; V={1,2,...,M} 观测状态的个数*/
     vector<vector<double>> A;	/* A[1..N][1..N]. a[i][j] is the transition prob
 			   of going from state i at time t to state j
-			   at time t+1 */
+			   at time t+1 隐藏状态之间的转移概率*/
     vector<vector<double>> B;	/* B[1..N][1..M]. b[j][k] is the probability of
-			   of observing symbol k in state j */
-    vector<double> pi;	/* pi[1..N] pi[i] is the initial state distribution. */
+			   of observing symbol k in state j 隐藏状态到观测状态的转移概率分布*/
+    vector<double> pi;	/* pi[1..N] pi[i] is the initial state distribution. 初始化概率分布*/
 
 public:
     /**
@@ -21,14 +21,14 @@ public:
     HMM(int n, int m, vector<vector<double>> AA, vector<vector<double>> BB, vector<double> PI ):
             N(n),M(m),A(AA),B(BB),pi(PI){}
 
-    void __init__(int n, int m, vector<vector<double>> A, vector<vector<double>> B, vector<double> pi){
-        this->N = n;
-        this->M = m;
-
-        this->A = A;
-        this->B = B;
-        this->pi = pi;
-    }
+//    void __init__(int n, int m, vector<vector<double>> A, vector<vector<double>> B, vector<double> pi){
+//        this->N = n;
+//        this->M = m;
+//
+//        this->A = A;
+//        this->B = B;
+//        this->pi = pi;
+//    }
     /**
      * 前向算法：
      * 具体见《统计学习方法》P175页
@@ -105,7 +105,7 @@ public:
 
         for(int i=1; i<=N; i++){
             delta[1][i] = pi[i]*B[i][O[1]];
-            psi[1][i] = 0.0;
+            psi[1][i] = 0;
         }
 
         /**
@@ -154,8 +154,8 @@ public:
  * 统计学习方法中前向概率计算例题
  */
 void testForward(){
-    int n = 3;
-    int m = 2;
+    unsigned int n = 3;
+    unsigned int m = 2;
     vector<vector<double>> A(n+1, vector<double>(n+1,0.0));
     vector<vector<double>> B(n+1, vector<double>(m+1,0.0));
     vector<double> pi(n+1,0.0);
@@ -177,7 +177,7 @@ void testForward(){
     HMM hmm(n,m,A,B,pi);
 
     vector<int> O = {0,1,2,1};
-    int T = 3;
+    unsigned int T = 3;
 
     vector<vector<double>> alpha(T+1, vector<double>(n+1,0.0));
     hmm.forward(T, O, alpha, &prob);
@@ -191,10 +191,12 @@ void testForward(){
 }
 
 
-
+/**
+ * 统计学习方法中Viterbi例题
+ */
 void testViterbi(){
-    int n = 3;
-    int m = 2;
+    unsigned int n = 3;
+    unsigned int m = 2;
     vector<vector<double>> A(n+1, vector<double>(n+1,0.0));
     vector<vector<double>> B(n+1, vector<double>(m+1,0.0));
     vector<double> pi(n+1,0.0);
@@ -215,7 +217,7 @@ void testViterbi(){
     HMM hmm(n,m,A,B,pi);
 
     vector<int> O = {0,1,2,1};
-    int T = 3;
+    unsigned int T = 3;
 
     double prob = 0.0;
 
@@ -225,8 +227,23 @@ void testViterbi(){
     vector<int> path (T+1, 0);
 
     hmm.Viterbi(T,O,delta,psi,path,&prob);
+    cout<<"Delta: \n";
+    for(int i=1; i<=T; i++){
+        for(int j=1; j<=n; j++){
+            cout<<delta[i][j]<<" ";
+        }
+        cout<<endl;
+    }
 
-    for(int i=1; i<path.size(); i++)
+    cout<<"psi:\n";
+    for(int i=1; i<=T; i++){
+        for(int j=1; j<=n; j++){
+            cout<<psi[i][j]<<" ";
+        }
+        cout<<endl;
+    }
+    cout<<"Path:\n";
+    for(unsigned int i=1; i<path.size(); i++)
         cout<<path.at(i)<<" ";
 }
 
